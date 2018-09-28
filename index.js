@@ -11,9 +11,13 @@ app.use((request, response, next) => {
 
 //Get random contract
 app.get('/getData', (request, response, next) => {
-  dbOperations[request.query.operation](request.query)
-              .then(res => response.send(res))
-              .catch(err => response.send(err));
+  if(dbOperations[request.query.operation]) {
+    dbOperations[request.query.operation](request.query)
+                .then(res => response.send(res))
+                .catch(err => response.send(err));
+  } else {
+    response.send('Operation could not be found');
+  }
 })
 
 
