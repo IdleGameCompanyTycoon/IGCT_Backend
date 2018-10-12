@@ -43,6 +43,7 @@ const getContract = (query) => {
 
 // Get an random employee application
 const getApplication = (query) => {
+  console.log(db);
   return new Promise((reject, resolve) => {
     const lastName = getRandomEntry('Employee_lastName');
     const givenName = getRandomEntry('Employee_givenName');
