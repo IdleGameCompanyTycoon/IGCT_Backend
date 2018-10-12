@@ -1,5 +1,13 @@
 const db = require('../db');
 
+// Helper functions
+//______________________________________________________________________________
+
+const calcRandomMidOfVals =  (valLow, valHigh) => {
+  let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
+  return valRand + valLow;
+}
+
 // Fetch a random entry from given table
 const getRandomEntry = function(table) {
   return new Promise((resolve, reject) => {
@@ -25,6 +33,8 @@ const getRandomEntryByConidtion = function(table, condition) {
     })
   })
 }
+
+//______________________________________________________________________________
 
 // FIXME: Fetch from the contracts table instead of Employee_lastName
 const getContract = (query) => {
