@@ -1,27 +1,25 @@
 const { Client } = require('pg');
 require('dotenv').config();
 
-let client;
+const connect = async () => {
+  return new Promise((resolve, reject) => {
+    let client = new Client({
+      connectionString: process.env.DATABASE_URL,
+      ssl: true,
+    });
 
-const connect = () => {
-  client = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: true,
-  });
-
-  client.connect((err) => {
-    if (err) {
-      console.log(err)
-      client.end();
-      setTimeout(() => connect(), 5000);
-    } else {
-      console.log('Succesfully applied database connection')
-    }
-  });
+    await client.connect((err) => {
+      if (err) {
+        client.end();
+        reject(err);
+      } else {
+        resolve(client)
+      }
+    });
+  })
 }
 
-connect();
 
 
 
-module.exports = client;
+module.exports = connect;

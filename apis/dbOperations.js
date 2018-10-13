@@ -1,4 +1,19 @@
-const db = require('../db');
+const connect = require('../db');
+
+// Establis connection and reconnect until connection is establised
+let db;
+const establishConnection = () => {
+  connect().then(res => {
+    db = res;
+    console.log('Connected to Database')
+  })
+  .catch(err => {
+    console.log(err);
+    establishConnection();
+  })
+}
+
+establishConnection();
 
 // Helper functions
 //______________________________________________________________________________
@@ -43,7 +58,6 @@ const getContract = (query) => {
 
 // Get an random employee application
 const getApplication = (query) => {
-  console.log(db);
   return new Promise((reject, resolve) => {
     const lastName = getRandomEntry('Employee_lastName');
     const givenName = getRandomEntry('Employee_givenName');
