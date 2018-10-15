@@ -65,26 +65,25 @@ const getApplication = (query) => {
     // Proceed with data processing when all promises have been resolved
     Promise.all([lastName, givenName, data])
            .then(responses => {
+            const employeeData = responses[2].rows[0];
+
+             const resObj = {
+               givenName: responses[1].rows[0].givenName,
+               lastName: responses[0].rows[0].lastName,
+               employeeHiytory: employeeData.history,
+               loc: calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
+               payment: calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher)
+             }
+
               // Fech the picture based on the gender from the given name response
              getRandomEntryByConidtion('Employee_picture', `gender=${responses[1].rows[0].gender}`)
                                       .then(picRes => {
-                                        const resObj = {
-                                          givenName: responses[1].rows[0].givenName,
-                                          lastName: responses[0].rows[0].lastName,
-                                          picture: picRes.rows[0].picture,
-                                          employeeData: responses[2].rows[0]
-                                        }
+                                        resObj.picture =  picRes.rows[0].picture;
                                         resolve(resObj);
                                       })
                                       .catch(err => {
                                         // If the picture fetching fails, send without picture url
-                                        const resObj = {
-                                          givenName: responses[1].rows[0].givenName,
-                                          lastName: responses[0].rows[0].lastName,
-                                          picture: null,
-                                          employeeData: responses[2].rows[0]
-                                        }
-
+                                        resObj.picture =  null;
                                         resolve(resObj);
                                       });
            })
