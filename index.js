@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express()
 const PORT = process.env.PORT || 5000;
-const dbOperations = require('./apis/dbOperations');
+const ConnectionManager = require('./apis/ConnectionManager');
 
 app.use((request, response, next) => {
   response.header("Access-Control-Allow-Origin", "*");
@@ -9,10 +9,12 @@ app.use((request, response, next) => {
   next();
 });
 
+const connectionManager = new ConnectionManager();
+
 //Get random contract
 app.get('/getData', (request, response, next) => {
-  if(dbOperations[request.query.operation]) {
-    dbOperations[request.query.operation](request.query)
+  if(true) {
+    connectionManager.runAction(request.query.operation, request.query)
                 .then(res => response.send(res))
                 .catch(err => response.send(err));
   } else {
