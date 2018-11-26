@@ -53,7 +53,7 @@ const getRandomEntryByConidtion = function(table, condition) {
 
 // FIXME: Fetch from the contracts table instead of Employee_lastName
 const getContract = (query) => {
-  return getRandomEntry('Employee_lastName');
+  return getRandomEntry('contract');
 }
 
 // Get an random employee application
