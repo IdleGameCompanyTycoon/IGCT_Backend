@@ -33,12 +33,17 @@ class ConnectionManager {
   }
 
   success(action, client, query) {
-    return this[action](client, query)
+    if(this[action]) {
+      return this[action](client, query)
+    } else{
+      client.end();
+      return Promise.reject('operation not found')
+    }
   }
 
   error(err) {
     console.log('connection was established', err);
-    return 'connection to database failed'
+    return Promise.reject('connection to database failed');
   }
 
   // Helper Functions
