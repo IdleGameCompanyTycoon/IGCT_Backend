@@ -1,4 +1,5 @@
 const { Client, Pool } = require('pg');
+const { employeeSkills } = require('./helpers');
 require('dotenv').config();
 
 class ConnectionManager {
@@ -91,7 +92,8 @@ class ConnectionManager {
               loc: this.calcRandomMidOfVals(contract.loc_lower, contract.loc_higher),
               revenue: this.calcRandomMidOfVals(contract.revenue_lower, contract.revenue_higher),
               contractType: contract.contractType,
-              companyType: contract.companyType
+              companyType: contract.companyType,
+              team: undefined
             }
             done();
             resolve(resObj);
@@ -106,8 +108,11 @@ class ConnectionManager {
       const lastName = this.getRandomEntry(client, 'Employee_lastName', done);
       const givenName = this.getRandomEntry(client, 'Employee_givenName', done);
       const data = this.getRandomEntry(client, 'Employee_data', done);
+
+      // Add dynamic employee skill posibillitys
+      const skills = employeeSkills(2, 'developer');
       // Proceed with data processing when all promises have been resolved
-      Promise.all([lastName, givenName, data])
+      Promise.all([lastName, givenName, data, skills])
              .then(responses => {
               const employeeData = responses[2].rows[0];
 
@@ -116,7 +121,8 @@ class ConnectionManager {
                  lastName: responses[0].rows[0].lastName,
                  employeeHiytory: employeeData.history,
                  loc: this.calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
-                 payment: this.calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher)
+                 payment: this.calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher),
+                 skills: responses[3]
                }
 
                 // Fech the picture based on the gender from the given name response
