@@ -1,25 +1,23 @@
-const { Client } = require('pg');
+const { Client, Pool } = require('pg');
 require('dotenv').config();
 
 class ConnectionManager {
-  constructor() {
-    this.runAction = this.runAction.bind(this);
-    this.success =  this.success.bind(this);
-  }
-
   connect() {
     return new Promise((resolve, reject) => {
-      let client = new Client({
-        connectionString: process.env.DATABASE_URL,
-        ssl: true,
-      });
+      if(!this.pool) {
+         this.pool = new Pool({
+          connectionString: process.env.DATABASE_URL,
+          ssl: true,
+          idleTimeoutMillis: 300000
+        });
+      }
 
-      client.connect((err) => {
+      this.pool.connect((err, client, done) => {
         if (err) {
-          client.end();
+          done();
           reject(err);
         } else {
-          resolve(client)
+          resolve({client: client, close: done})
         }
       });
     })
@@ -27,16 +25,16 @@ class ConnectionManager {
 
   runAction(action, query) {
     return new Promise((resolve, reject) => {
-      this.connect().then(client => resolve(this.success(action, client, query)))
+      this.connect().then(obj => resolve(this.success(action, obj.client, query, obj.close)))
                     .catch(err => reject(this.error(err)))
     })
   }
 
-  success(action, client, query) {
+  success(action, client, query, done) {
     if(this[action]) {
-      return this[action](client, query)
+      return this[action](client, query, done)
     } else{
-      client.end();
+      done();
       return Promise.reject('operation not found')
     }
   }
@@ -52,29 +50,29 @@ class ConnectionManager {
     return valRand + valLow;
   }
 
-  getRandomEntry(client, table, closeConn = false) {
+  getRandomEntry(client, table, done, closeConn = false) {
     return new Promise((resolve, reject) => {
         client.query(`SELECT * FROM igct."${table}" ORDER BY RANDOM() limit 1`, (error, results) => {
           if (error) {
-            closeConn && client.end();
+            closeConn && done();
             reject(error);
           } else {
-            closeConn && client.end();
+            closeConn && done();
             resolve(results);
           }
       })
     })
   }
 
-  getRandomEntryByConidtion (client, table, condition, closeConn = false) {
+  getRandomEntryByConidtion (client, table, condition, done, closeConn = false) {
     return new Promise((resolve, reject) => {
         client.query(`SELECT * FROM igct."${table}" WHERE ${condition} ORDER BY RANDOM() limit 1`, (error, results) => {
           if (error) {
-            closeConn && client.end();
+            closeConn && done();
             reject(error);
           } else {
             // Close connection if this is the last action
-            closeConn && client.end();
+            closeConn && done();
             resolve(results);
           }
       })
@@ -82,9 +80,9 @@ class ConnectionManager {
   }
   // _______________________________________________________________________
 
-  getContract(client, query) {
+  getContract(client, query, done) {
     return new Promise((resolve, reject) => {
-      this.getRandomEntry(client, 'Contracts')
+      this.getRandomEntry(client, 'Contracts', done)
           .then(res => {
             let contract = res.rows[0];
             const resObj =  {
@@ -95,7 +93,7 @@ class ConnectionManager {
               contractType: contract.contractType,
               companyType: contract.companyType
             }
-            client.end();
+            done();
             resolve(resObj);
           })
           .catch(err => reject(err))
@@ -103,11 +101,11 @@ class ConnectionManager {
   }
 
   // Get an random employee application
-  getApplication(client, query) {
+  getApplication(client, query, done) {
     return new Promise((reject, resolve) => {
-      const lastName = this.getRandomEntry(client, 'Employee_lastName');
-      const givenName = this.getRandomEntry(client, 'Employee_givenName');
-      const data = this.getRandomEntry(client, 'Employee_data');
+      const lastName = this.getRandomEntry(client, 'Employee_lastName', done);
+      const givenName = this.getRandomEntry(client, 'Employee_givenName', done);
+      const data = this.getRandomEntry(client, 'Employee_data', done);
       // Proceed with data processing when all promises have been resolved
       Promise.all([lastName, givenName, data])
              .then(responses => {
@@ -122,16 +120,16 @@ class ConnectionManager {
                }
 
                 // Fech the picture based on the gender from the given name response
-               this.getRandomEntryByConidtion(client, 'Employee_picture', `gender=${responses[1].rows[0].gender}`)
+               this.getRandomEntryByConidtion(client, 'Employee_picture', `gender=${responses[1].rows[0].gender}`, done)
                                         .then(picRes => {
                                           resObj.picture =  picRes.rows[0].picture;
-                                          client.end();
+                                          done();
                                           resolve(resObj);
                                         })
                                         .catch(err => {
                                           // If the picture fetching fails, send without picture url
                                           resObj.picture = null;
-                                          client.end();
+                                          done();
                                           resolve(resObj);
                                         });
              })
