@@ -93,7 +93,8 @@ class ConnectionManager {
               revenue: this.calcRandomMidOfVals(contract.revenue_lower, contract.revenue_higher),
               contractType: contract.contractType,
               companyType: contract.companyType,
-              team: undefined
+              team: undefined,
+              pinned: false
             }
             done();
             resolve(resObj);
@@ -122,7 +123,9 @@ class ConnectionManager {
                  employeeHiytory: employeeData.history,
                  loc: this.calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
                  payment: this.calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher),
-                 skills: responses[3]
+                 skills: responses[3],
+                 workingDays: undefined,
+                 working: false
                }
 
                 // Fech the picture based on the gender from the given name response
