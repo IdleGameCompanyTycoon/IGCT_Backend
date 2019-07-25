@@ -37,7 +37,7 @@ const getRandomEntry = function(table) {
 }
 
 // Fetch a random entry from given table and with given condition
-const getRandomEntryByConidtion = function(table, condition) {
+const getRandomEntryByCondition = function(table, condition) {
   return new Promise((resolve, reject) => {
       db.query(`SELECT * FROM igct."${table}" WHERE ${condition} ORDER BY RANDOM() limit 1`, (error, results) => {
         if (error) {
@@ -76,7 +76,7 @@ const getApplication = (query) => {
              }
 
               // Fech the picture based on the gender from the given name response
-             getRandomEntryByConidtion('Employee_picture', `gender=${responses[1].rows[0].gender}`)
+             getRandomEntryByCondition('Employee_picture', `gender=${responses[1].rows[0].gender}`)
                                       .then(picRes => {
                                         resObj.picture =  picRes.rows[0].picture;
                                         resolve(resObj);
