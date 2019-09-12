@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express()
 const PORT = process.env.PORT || 5000;
-const ConnectionManager = require('./apis/ConnectionManager');
+const ConnectionManager = require('./apis/ConnectionManager/ConnectionManager');
 
 app.use((request, response, next) => {
   response.header("Access-Control-Allow-Origin", "*");
