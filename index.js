@@ -8,10 +8,6 @@ const dir = path.join(__dirname, 'public');
 
 app.use(express.static(dir));
 
-app.listen(5001, function() {
-  console.log('Listening on http://localhost:5001/ for images');
-})
-
 app.use((request, response, next) => {
   response.header("Access-Control-Allow-Origin", "*");
   response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
