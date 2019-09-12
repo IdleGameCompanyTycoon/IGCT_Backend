@@ -9,10 +9,10 @@ const { employeeSkills } = require('../helpers');
   const calcPenalty = (valLow, valHigh, contractType) => {
     let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
 
-    if(contractType == basic){
-      valRand = valRand * 0.7;
-    }else if(contractType == timed){
-      valRand = valRand * 1.3;
+    if(contractType === "basic"){
+      valRand = valRand * 0.6;
+    }else if(contractType === "timed"){
+      valRand = valRand * 1.5;
     }
     
     return valRand + valLow;
