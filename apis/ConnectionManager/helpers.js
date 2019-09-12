@@ -46,6 +46,7 @@ const { employeeSkills } = require('../helpers');
               description: contract.desc,
               loc: calcRandomMidOfVals(contract.loc_lower, contract.loc_higher),
               revenue: calcRandomMidOfVals(contract.revenue_lower, contract.revenue_higher),
+              penalty: calcRandomMidOfVals(contract.revenue_lower, contract.revenue_higher),
               contractType: contract.contractType,
               companyType: contract.companyType,
               team: undefined,
