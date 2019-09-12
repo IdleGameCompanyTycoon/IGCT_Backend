@@ -11,7 +11,7 @@ app.use((request, response, next) => {
 
 const connectionManager = new ConnectionManager();
 
-//Get random contract
+//Get data
 app.get('/getData', (request, response, next) => {
   if(true) {
     connectionManager.runAction(request.query.operation, request.query)

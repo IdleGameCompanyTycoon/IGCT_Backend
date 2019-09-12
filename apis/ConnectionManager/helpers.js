@@ -60,7 +60,6 @@ const { employeeSkills } = require('../helpers');
 
 // Get an random employee application
   const getApplication = (client, query, done) => {
-    console.log('1')
     return new Promise((reject, resolve) => {
       const lastName = getRandomEntry(client, 'Employee_lastName', done);
       const givenName = getRandomEntry(client, 'Employee_givenName', done);
@@ -76,7 +75,7 @@ const { employeeSkills } = require('../helpers');
                const resObj = {
                  givenName: responses[1].rows[0].givenName,
                  lastName: responses[0].rows[0].lastName,
-                 employeeHiytory: employeeData.history,
+                 employeeHistory: employeeData.history,
                  loc: calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
                  payment: calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher),
                  skills: responses[3],
