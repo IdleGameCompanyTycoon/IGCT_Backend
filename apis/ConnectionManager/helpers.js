@@ -1,57 +1,24 @@
-const { Client, Pool } = require('pg');
-const { employeeSkills } = require('./helpers');
-require('dotenv').config();
+const { employeeSkills } = require('../helpers');
 
-class ConnectionManager {
-  connect() {
-    return new Promise((resolve, reject) => {
-      if(!this.pool) {
-         this.pool = new Pool({
-          connectionString: process.env.DATABASE_URL,
-          ssl: true,
-          idleTimeoutMillis: 300000
-        });
-      }
-
-      this.pool.connect((err, client, done) => {
-        if (err) {
-          done();
-          reject(err);
-        } else {
-          resolve({client: client, close: done})
-        }
-      });
-    })
-  }
-
-  runAction(action, query) {
-    return new Promise((resolve, reject) => {
-      this.connect().then(obj => resolve(this.success(action, obj.client, query, obj.close)))
-                    .catch(err => reject(this.error(err)))
-    })
-  }
-
-  success(action, client, query, done) {
-    if(this[action]) {
-      return this[action](client, query, done)
-    } else{
-      done();
-      return Promise.reject('operation not found')
-    }
-  }
-
-  error(err) {
-    console.log('connection was established', err);
-    return Promise.reject('connection to database failed');
-  }
-
-  // Helper Functions
-  calcRandomMidOfVals(valLow, valHigh) {
+// Helper Functions
+  const calcRandomMidOfVals = (valLow, valHigh) => {
     let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
     return valRand + valLow;
   }
 
-  getRandomEntry(client, table, done, closeConn = false) {
+  const calcPenalty = (valLow, valHigh, contractType) => {
+    let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
+
+    if(contractType == basic){
+      valRand = valRand * 0.7;
+    }else if(contractType == timed){
+      valRand = valRand * 1.3;
+    }
+    
+    return valRand + valLow;
+  }
+
+  const getRandomEntry = (client, table, done, closeConn = false) => {
     return new Promise((resolve, reject) => {
         client.query(`SELECT * FROM igct."${table}" ORDER BY RANDOM() limit 1`, (error, results) => {
           if (error) {
@@ -65,7 +32,7 @@ class ConnectionManager {
     })
   }
 
-  getRandomEntryByConidtion (client, table, condition, done, closeConn = false) {
+  const getRandomEntryByCondition = (client, table, condition, done, closeConn = false) => {
     return new Promise((resolve, reject) => {
         client.query(`SELECT * FROM igct."${table}" WHERE ${condition} ORDER BY RANDOM() limit 1`, (error, results) => {
           if (error) {
@@ -79,18 +46,19 @@ class ConnectionManager {
       })
     })
   }
-  // _______________________________________________________________________
+// _______________________________________________________________________
 
-  getContract(client, query, done) {
+  const getContract = (client, query, done) => {
     return new Promise((resolve, reject) => {
-      this.getRandomEntry(client, 'Contracts', done)
+      getRandomEntry(client, 'Contracts', done)
           .then(res => {
             let contract = res.rows[0];
             const resObj =  {
               name: contract.name,
               description: contract.desc,
-              loc: this.calcRandomMidOfVals(contract.loc_lower, contract.loc_higher),
-              revenue: this.calcRandomMidOfVals(contract.revenue_lower, contract.revenue_higher),
+              loc: calcRandomMidOfVals(contract.loc_lower, contract.loc_higher),
+              revenue: calcRandomMidOfVals(contract.revenue_lower, contract.revenue_higher),
+              penalty: calcPenalty(contract.revenue_lower, contract.revenue_higher, contract.contractType),
               contractType: contract.contractType,
               companyType: contract.companyType,
               team: undefined,
@@ -103,12 +71,12 @@ class ConnectionManager {
     });
   }
 
-  // Get an random employee application
-  getApplication(client, query, done) {
+// Get an random employee application
+  const getApplication = (client, query, done) => {
     return new Promise((reject, resolve) => {
-      const lastName = this.getRandomEntry(client, 'Employee_lastName', done);
-      const givenName = this.getRandomEntry(client, 'Employee_givenName', done);
-      const data = this.getRandomEntry(client, 'Employee_data', done);
+      const lastName = getRandomEntry(client, 'Employee_lastName', done);
+      const givenName = getRandomEntry(client, 'Employee_givenName', done);
+      const data = getRandomEntry(client, 'Employee_data', done);
 
       // Add dynamic employee skill posibillitys
       const skills = employeeSkills(2, 'developer');
@@ -120,16 +88,16 @@ class ConnectionManager {
                const resObj = {
                  givenName: responses[1].rows[0].givenName,
                  lastName: responses[0].rows[0].lastName,
-                 employeeHiytory: employeeData.history,
-                 loc: this.calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
-                 payment: this.calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher),
+                 employeeHistory: employeeData.history,
+                 loc: calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
+                 payment: calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher),
                  skills: responses[3],
                  workingDays: undefined,
                  working: false
                }
 
                 // Fech the picture based on the gender from the given name response
-               this.getRandomEntryByConidtion(client, 'Employee_picture', `gender=${responses[1].rows[0].gender}`, done)
+               getRandomEntryByCondition(client, 'Employee_picture', `gender=${responses[1].rows[0].gender}`, done)
                                         .then(picRes => {
                                           resObj.picture =  picRes.rows[0].picture;
                                           done();
@@ -145,9 +113,12 @@ class ConnectionManager {
              .catch(err => reject(err));
     })
   }
+
+
+module.exports = {
+  calcRandomMidOfVals: calcRandomMidOfVals,
+  getRandomEntry: getRandomEntry,
+  getRandomEntryByCondition: getRandomEntryByCondition,
+  getContract: getContract,
+  getApplication: getApplication
 }
-
-
-
-
-module.exports = ConnectionManager;

@@ -1,7 +1,12 @@
+const path = require('path')
 const express = require('express');
 const app = express()
 const PORT = process.env.PORT || 5000;
-const ConnectionManager = require('./apis/ConnectionManager');
+const ConnectionManager = require('./apis/ConnectionManager/ConnectionManager');
+
+const dir = path.join(__dirname, 'public/img');
+
+app.use('/images', express.static(dir));
 
 app.use((request, response, next) => {
   response.header("Access-Control-Allow-Origin", "*");
@@ -11,7 +16,7 @@ app.use((request, response, next) => {
 
 const connectionManager = new ConnectionManager();
 
-//Get random contract
+//Get data
 app.get('/getData', (request, response, next) => {
   if(true) {
     connectionManager.runAction(request.query.operation, request.query)
