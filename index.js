@@ -4,9 +4,9 @@ const app = express()
 const PORT = process.env.PORT || 5000;
 const ConnectionManager = require('./apis/ConnectionManager/ConnectionManager');
 
-const dir = path.join(__dirname, 'public');
+const dir = path.join(__dirname, 'public/img');
 
-app.use(express.static(dir));
+app.use('/images', express.static(dir));
 
 app.use((request, response, next) => {
   response.header("Access-Control-Allow-Origin", "*");
