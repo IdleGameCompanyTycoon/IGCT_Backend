@@ -1,7 +1,16 @@
+const path = require('path')
 const express = require('express');
 const app = express()
 const PORT = process.env.PORT || 5000;
 const ConnectionManager = require('./apis/ConnectionManager/ConnectionManager');
+
+const dir = path.join(__dirname, 'public');
+
+app.use(express.static(dir));
+
+app.listen(5001, function() {
+  console.log('Listening on http://localhost:5001/ for images');
+})
 
 app.use((request, response, next) => {
   response.header("Access-Control-Allow-Origin", "*");
