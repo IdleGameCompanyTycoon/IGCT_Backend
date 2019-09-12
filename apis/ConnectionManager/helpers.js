@@ -6,6 +6,18 @@ const { employeeSkills } = require('../helpers');
     return valRand + valLow;
   }
 
+  const calcPenalty = (valLow, valHigh, contractType) => {
+    let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
+
+    if(contractType == basic){
+      valRand = valRand * 0.7;
+    }else if(contractType == timed){
+      valRand = valRand * 1.3;
+    }
+    
+    return valRand + valLow;
+  }
+
   const getRandomEntry = (client, table, done, closeConn = false) => {
     return new Promise((resolve, reject) => {
         client.query(`SELECT * FROM igct."${table}" ORDER BY RANDOM() limit 1`, (error, results) => {
@@ -46,7 +58,7 @@ const { employeeSkills } = require('../helpers');
               description: contract.desc,
               loc: calcRandomMidOfVals(contract.loc_lower, contract.loc_higher),
               revenue: calcRandomMidOfVals(contract.revenue_lower, contract.revenue_higher),
-              penalty: calcRandomMidOfVals(contract.revenue_lower, contract.revenue_higher),
+              penalty: calcPenalty(contract.revenue_lower, contract.revenue_higher, contract.contractType),
               contractType: contract.contractType,
               companyType: contract.companyType,
               team: undefined,
