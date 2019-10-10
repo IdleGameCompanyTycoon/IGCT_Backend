@@ -21,7 +21,10 @@ app.get('/getData', (request, response, next) => {
   if(true) {
     connectionManager.runAction(request.query.operation, request.query)
                 .then(res => response.send(res))
-                .catch(err => response.send(err));
+                .catch(err => {
+                  console.log(err)
+                  response.status(500).end()
+                  });
   } else {
     response.send('Operation could not be found');
   }

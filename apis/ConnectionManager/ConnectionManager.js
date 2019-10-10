@@ -10,7 +10,7 @@ class ConnectionManager {
          this.pool = new Pool({
           connectionString: process.env.DATABASE_URL,
           ssl: true,
-          idleTimeoutMillis: 300000
+          idleTimeoutMillis: 60000
         });
       }
 

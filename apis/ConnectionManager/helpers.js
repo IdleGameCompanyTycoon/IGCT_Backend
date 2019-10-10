@@ -73,7 +73,7 @@ const { employeeSkills } = require('../helpers');
 
 // Get an random employee application
   const getApplication = (client, query, done) => {
-    return new Promise((reject, resolve) => {
+    return new Promise((resolve, reject ) => {
       const lastName = getRandomEntry(client, 'Employee_lastName', done);
       const givenName = getRandomEntry(client, 'Employee_givenName', done);
       const data = getRandomEntry(client, 'Employee_data', done);
