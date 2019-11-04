@@ -89,6 +89,7 @@ const { employeeSkills } = require('../helpers');
                  givenName: responses[1].rows[0].givenName,
                  lastName: responses[0].rows[0].lastName,
                  employeeHistory: employeeData.history,
+                 employeeType: employeeData.employeeType,
                  loc: calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
                  payment: calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher),
                  skills: responses[3],
