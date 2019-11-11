@@ -11,6 +11,9 @@ class ConnectionManager {
           ssl: true,
           idleTimeoutMillis: 60000
         });
+        this.pool.on('error', (err, client) => {
+          console.log("Connection to database unexpectedly lost!")
+        });
       }
 
       this.pool.connect((err, client, done) => {

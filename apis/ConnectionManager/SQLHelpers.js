@@ -83,7 +83,7 @@ const getApplication = (client, query, done) => {
     // Add dynamic employee skill posibillitys
     
     // Proceed with data processing when all promises have been resolved
-    Promise.all([lastName, givenName, data, skills])
+    Promise.all([lastName, givenName, data])
             .then(responses => {
             const employeeData = responses[2].rows[0];
             const skills = employeeSkills(SKILL_CONSTANT, employeeData.employeeType);
