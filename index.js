@@ -3,6 +3,7 @@ const express = require('express');
 const app = express()
 const PORT = process.env.PORT || 5000;
 const ConnectionManager = require('./apis/ConnectionManager/ConnectionManager');
+const { writeLog } = require('./apis/ConnectionManager/helpers');
 
 const dir = path.join(__dirname, 'public/img');
 
@@ -15,6 +16,7 @@ app.use((request, response, next) => {
 });
 
 const connectionManager = new ConnectionManager();
+writeLog("INFO", "Connection esablished");
 
 //Get data
 app.get('/getData', (request, response, next) => {

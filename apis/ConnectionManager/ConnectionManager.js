@@ -1,5 +1,6 @@
 const { Client, Pool } = require('pg');
-const helper = require('./SQLHelpers')
+const helper = require('./SQLHelpers');
+const { writeLog } = require('./helpers');
 require('dotenv').config();
 
 class ConnectionManager {

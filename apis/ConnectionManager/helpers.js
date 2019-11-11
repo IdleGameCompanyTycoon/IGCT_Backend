@@ -1,4 +1,42 @@
 const templates = require('./employeeTemplates')
+const fs = require('fs');
+
+
+const writeLog = (severity, message) => {
+  let time = getDateTime();
+  let line = time + " - [" + severity + "] - " + message + "\n";
+
+  fs.appendFile("./logs/backend.log", line, (err) => {
+    if(err){
+      return console.log(err);
+    }
+  })
+}
+
+function getDateTime() {
+
+  var date = new Date();
+
+  var hour = date.getHours();
+  hour = (hour < 10 ? "0" : "") + hour;
+
+  var min  = date.getMinutes();
+  min = (min < 10 ? "0" : "") + min;
+
+  var sec  = date.getSeconds();
+  sec = (sec < 10 ? "0" : "") + sec;
+
+  var year = date.getFullYear();
+
+  var month = date.getMonth() + 1;
+  month = (month < 10 ? "0" : "") + month;
+
+  var day  = date.getDate();
+  day = (day < 10 ? "0" : "") + day;
+
+  return year + ":" + month + ":" + day + "-" + hour + ":" + min + ":" + sec;
+
+}
 
 const employeeSkills = (cap, employeeType) => {
   let template = templates[employeeType];
@@ -22,5 +60,6 @@ const employeeSkills = (cap, employeeType) => {
 }
 
 module.exports = {
-  employeeSkills: employeeSkills
+  employeeSkills: employeeSkills,
+  writeLog: writeLog
 }
