@@ -1,3 +1,4 @@
+const settings = require('../../settings.json');
 const { employeeSkills } = require('../helpers');
 
 // Helper Functions
@@ -79,7 +80,7 @@ const { employeeSkills } = require('../helpers');
       const data = getRandomEntry(client, 'Employee_data', done);
 
       // Add dynamic employee skill posibillitys
-      const skills = employeeSkills(2, 'developer');
+      const skills = employeeSkills(settings.SKILL_CONSTANT, 'developer');
       // Proceed with data processing when all promises have been resolved
       Promise.all([lastName, givenName, data, skills])
              .then(responses => {
