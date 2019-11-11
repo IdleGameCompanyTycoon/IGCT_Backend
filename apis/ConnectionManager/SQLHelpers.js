@@ -81,11 +81,12 @@ const getApplication = (client, query, done) => {
     const data = getRandomEntry(client, 'Employee_data', done);
 
     // Add dynamic employee skill posibillitys
-    const skills = employeeSkills(SKILL_CONSTANT, 'developer');
+    
     // Proceed with data processing when all promises have been resolved
     Promise.all([lastName, givenName, data, skills])
             .then(responses => {
             const employeeData = responses[2].rows[0];
+            const skills = employeeSkills(SKILL_CONSTANT, employeeData.employeeType);
 
               const resObj = {
                 givenName: responses[1].rows[0].givenName,
@@ -94,7 +95,7 @@ const getApplication = (client, query, done) => {
                 employeeType: employeeData.employeeType,
                 loc: calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
                 payment: calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher),
-                skills: responses[3],
+                skills: skills,
                 workingDays: undefined,
                 working: false
               }
