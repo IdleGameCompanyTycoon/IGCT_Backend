@@ -5,8 +5,10 @@ const fs = require('fs');
 const writeLog = (severity, message) => {
   let time = getDateTime();
   let line = time + " - [" + severity + "] - " + message + "\n";
-
-  fs.appendFile("./logs/backend.log", line, (err) => {
+  let currentDate = new Date();
+  let logname = currentDate.getDate() + "_" + currentDate.getMonth() + "_" + currentDate.getFullYear();
+  console.log(logname);
+  fs.appendFile("./logs/" + logname + ".log", line, (err) => {
     if(err){
       return console.log(err);
     }
