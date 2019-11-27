@@ -16,7 +16,7 @@ app.use((request, response, next) => {
 });
 
 const connectionManager = new ConnectionManager();
-writeLog("INFO", "Connection esablished _ TESTTESTTEST");
+writeLog("INFO", "Connection esablished");
 
 //Get data
 app.get('/getData', (request, response, next) => {
