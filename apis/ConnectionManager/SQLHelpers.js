@@ -1,5 +1,6 @@
 const { SKILL_CONSTANT, TIMED_PENALTY, BASIC_PENALTY } = require('../../settings.json');
 const { employeeSkills } = require('./helpers');
+const { writeLog } = require('./helpers');
 
 
 // Helper Functions
@@ -25,9 +26,11 @@ const getRandomEntry = (client, table, done, closeConn = false) => {
       client.query(`SELECT * FROM igct."${table}" ORDER BY RANDOM() limit 1`, (error, results) => {
         if (error) {
           closeConn && done();
+          writeLog("ERROR", error)
           reject(error);
         } else {
           closeConn && done();
+          writeLog("INFO", JSON.stringify(results))
           resolve(results);
         }
     })
@@ -40,9 +43,11 @@ const getRandomEntryByCondition = (client, table, condition, done, closeConn = f
         if (error) {
           closeConn && done();
           reject(error);
+          writeLog("ERROR", error)
         } else {
           // Close connection if this is the last action
           closeConn && done();
+          writeLog("INFO", JSON.stringify(results))
           resolve(results);
         }
     })

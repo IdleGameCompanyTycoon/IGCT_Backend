@@ -25,6 +25,7 @@ app.get('/getData', (request, response, next) => {
                 .then(res => response.send(res))
                 .catch(err => {
                   console.log(err)
+                  writeLog("ERROR", err);
                   response.status(500).end()
                   });
   } else {
