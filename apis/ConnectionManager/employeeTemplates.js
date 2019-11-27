@@ -34,6 +34,15 @@ const developer = {
   softwareSkills: softwareDevSkills,
 }
 
+const trainee = {
+  speed: 0.1,
+  softwareDev: {multiplier: 0.2},
+  gameDev: {multiplier: 0.2},
+  social: 0.6,
+  gameSkills: gameDevSkills,
+  softwareSkills: softwareDevSkills,
+}
+
 const projectManager = {
   speed: 0.3,
   softwareDev: {multiplier: 0.3},
@@ -55,5 +64,6 @@ const skillSetMapping = {
 module.exports = {
   projectManager: projectManager,
   developer: developer,
+  trainee: trainee,
   skillSetMapping: skillSetMapping,
 }
