@@ -2,7 +2,7 @@
 # Created by https://www.gitignore.io/api/node
 DOCKERFILE
 .vs
-.py
+*.py
 ### Node ###
 # Logs
 logs
