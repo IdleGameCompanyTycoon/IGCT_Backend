@@ -16,7 +16,7 @@ app.use((request, response, next) => {
 });
 
 const connectionManager = new ConnectionManager();
-writeLog("INFO", "Connection esablished");
+writeLog("3", "Connection esablished");
 
 //Get data
 app.get('/getData', (request, response, next) => {
@@ -25,7 +25,7 @@ app.get('/getData', (request, response, next) => {
                 .then(res => response.send(res))
                 .catch(err => {
                   console.log(err)
-                  writeLog("ERROR", err);
+                  writeLog("1", err);
                   response.status(500).end()
                   });
   } else {

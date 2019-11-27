@@ -13,7 +13,7 @@ class ConnectionManager {
           idleTimeoutMillis: 60000
         });
         this.pool.on('error', (err, client) => {
-          writeLog("ERROR", "Connection to database unexpectedly lost!")
+          writeLog("1", "Connection to database unexpectedly lost!")
           console.log("Connection to database unexpectedly lost!")
         });
       }
@@ -21,7 +21,7 @@ class ConnectionManager {
       this.pool.connect((err, client, done) => {
         if (err) {
           done();
-          writeLog("ERROR", err)
+          writeLog("1", err)
           reject(err);
         } else {
           resolve({client: client, close: done})

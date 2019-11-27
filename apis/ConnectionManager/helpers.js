@@ -1,39 +1,62 @@
 const templates = require('./employeeTemplates')
 const fs = require('fs');
+const { LOG_LEVEL } = require('../../settings.json');
 
 
-const writeLog = (severity, message) => {
-  let time = getDateTime();
-  let line = time + " - [" + severity + "] - " + message + "\n";
-  let currentDate = new Date();
-  let logname = currentDate.getDate() + "_" + currentDate.getMonth() + "_" + currentDate.getFullYear();
-  console.log(logname);
-  fs.appendFile("./logs/" + logname + ".log", line, (err) => {
-    if(err){
-      return console.log(err);
-    }
-  })
+const writeLog = (severity = "3", message) => {
+  if(severity <= LOG_LEVEL){
+
+    let month = new Array();
+    month[0] = "1";
+    month[1] = "2";
+    month[2] = "3";
+    month[3] = "4";
+    month[4] = "5";
+    month[5] = "6";
+    month[6] = "7";
+    month[7] = "8";
+    month[8] = "9";
+    month[9] = "10";
+    month[10] = "11";
+    month[11] = "12";
+
+    let severityTranslation = new Array();
+    severityTranslation[0] = "";
+    severityTranslation[1] = "ERROR";
+    severityTranslation[2] = "WARNING";
+    severityTranslation[3] = "INFO";
+
+    let time = getDateTime();
+    let line = time + " - [" + severityTranslation[severity] + "] - " + message + "\n";
+    let currentDate = new Date();
+    let logname = currentDate.getDate() + "_" + month[currentDate.getMonth()] + "_" + currentDate.getFullYear();
+    fs.appendFile("./logs/" + logname + ".log", line, (err) => {
+      if(err){
+        return console.log(err);
+      }
+    })
+  }
 }
 
 function getDateTime() {
 
-  var date = new Date();
+  let date = new Date();
 
-  var hour = date.getHours();
+  let hour = date.getHours();
   hour = (hour < 10 ? "0" : "") + hour;
 
-  var min  = date.getMinutes();
+  let min  = date.getMinutes();
   min = (min < 10 ? "0" : "") + min;
 
-  var sec  = date.getSeconds();
+  let sec  = date.getSeconds();
   sec = (sec < 10 ? "0" : "") + sec;
 
-  var year = date.getFullYear();
+  let year = date.getFullYear();
 
-  var month = date.getMonth() + 1;
+  let month = date.getMonth() + 1;
   month = (month < 10 ? "0" : "") + month;
 
-  var day  = date.getDate();
+  let day  = date.getDate();
   day = (day < 10 ? "0" : "") + day;
 
   return year + ":" + month + ":" + day + "-" + hour + ":" + min + ":" + sec;
