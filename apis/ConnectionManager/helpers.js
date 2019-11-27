@@ -21,7 +21,7 @@ const writeLog = (severity = "3", message) => {
     month[11] = "12";
 
     let severityTranslation = new Array();
-    severityTranslation[0] = "";
+    severityTranslation[0] = "IP";
     severityTranslation[1] = "ERROR";
     severityTranslation[2] = "WARNING";
     severityTranslation[3] = "INFO";

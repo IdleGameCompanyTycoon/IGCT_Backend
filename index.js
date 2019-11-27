@@ -21,6 +21,14 @@ writeLog("3", "Connection esablished");
 //Get data
 app.get('/getData', (request, response, next) => {
   if(true) {
+
+    let ip = (request.headers['x-forwarded-for'] || '').split(',').pop() || 
+      request.connection.remoteAddress || 
+      request.socket.remoteAddress || 
+      request.connection.socket.remoteAddress
+
+    writeLog("0", ip)
+
     connectionManager.runAction(request.query.operation, request.query)
                 .then(res => response.send(res))
                 .catch(err => {
