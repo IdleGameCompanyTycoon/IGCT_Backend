@@ -1,6 +1,10 @@
 {
+    "LOG_LEVEL": "2",
     "SKILL_CONSTANT": "1",
     "BASIC_PENALTY": "0.6",
     "TIMED_PENALTY": "1.5",
-    "LOG_LEVEL": "2"
+    "APPLICATION_PROPABILITY": {
+        "trainee": "1",
+        "developer": "3"
+    }
 }

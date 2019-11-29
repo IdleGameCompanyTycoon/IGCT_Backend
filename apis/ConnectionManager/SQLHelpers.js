@@ -1,4 +1,4 @@
-const { SKILL_CONSTANT, TIMED_PENALTY, BASIC_PENALTY } = require('../../settings.json');
+const { SKILL_CONSTANT, TIMED_PENALTY, BASIC_PENALTY, APPLICATION_PROPABILITY } = require('../../settings.json');
 const { employeeSkills } = require('./helpers');
 const { writeLog } = require('./helpers');
 
@@ -83,8 +83,8 @@ const getApplication = (client, query, done) => {
   return new Promise((resolve, reject ) => {
     const lastName = getRandomEntry(client, 'Employee_lastName', done);
     const givenName = getRandomEntry(client, 'Employee_givenName', done);
-    const data = getRandomEntry(client, 'Employee_data', done);
-
+    let type = getRandomEmployeeType();
+    const data = getRandomEntryByCondition(client, 'Employee_data', `employeetype='${type}'`, done);
     // Add dynamic employee skill posibillitys
     
     // Proceed with data processing when all promises have been resolved
@@ -123,6 +123,18 @@ const getApplication = (client, query, done) => {
   })
 }
 
+const getRandomEmployeeType = () => {
+  const probArr = [];
+  Object.keys(APPLICATION_PROPABILITY).forEach((key) => {
+    let num = APPLICATION_PROPABILITY[key];
+    while(num >= 1) {
+        probArr.push(key);
+        num--;
+    }
+  })
+  type = probArr[Math.floor(Math.random()*probArr.length)];
+  return type;
+}
 
 module.exports = {
   calcRandomMidOfVals: calcRandomMidOfVals,
