@@ -5,6 +5,9 @@
     "TIMED_PENALTY": "1.5",
     "APPLICATION_PROPABILITY": {
         "trainee": "1",
-        "developer": "3"
+        "developer": "2",
+        "hr": "1",
+        "freelancer": "1",
+        "projectmanager": "1"
     }
 }

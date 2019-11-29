@@ -97,12 +97,13 @@ const getApplication = (client, query, done) => {
                 givenName: responses[1].rows[0].givenName,
                 lastName: responses[0].rows[0].lastName,
                 employeeHistory: employeeData.history,
-                employeeType: employeeData.employeeType,
+                
                 loc: calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
                 payment: calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher),
                 skills: skills,
                 workingDays: undefined,
-                working: false
+                working: false,
+                employeetype: employeeData.employeetype
               }
 
               // Fech the picture based on the gender from the given name response
