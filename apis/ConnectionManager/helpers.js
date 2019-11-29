@@ -6,16 +6,13 @@ const { LOG_LEVEL } = require('../../settings.json');
 const writeLog = (severity = "3", message) => {
   if(severity <= LOG_LEVEL){
 
-    let month = [];
-    month = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
-
     let severityTranslation = [];
     severityTranslation = ["IP", "ERROR", "WARNING", "INFO"];
 
     let time = getDateTime();
     let line = time + " - [" + severityTranslation[severity] + "] - " + message + "\n";
     let currentDate = new Date();
-    let logname = currentDate.getDate() + "_" + month[currentDate.getMonth()] + "_" + currentDate.getFullYear();
+    let logname = currentDate.getDate() + "_" + (currentDate.getMonth()+1) + "_" + currentDate.getFullYear();
     fs.appendFile("./logs/" + logname + ".log", line, (err) => {
       if(err){
         return console.log(err);
