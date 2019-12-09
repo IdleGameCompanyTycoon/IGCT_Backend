@@ -86,12 +86,11 @@ const getApplication = (client, query, done) => {
     let type = getRandomEmployeeType();
     const data = getRandomEntryByCondition(client, 'Employee_data', `employeetype='${type}'`, done);
     // Add dynamic employee skill posibillitys
-    
     // Proceed with data processing when all promises have been resolved
     Promise.all([lastName, givenName, data])
             .then(responses => {
             const employeeData = responses[2].rows[0];
-            const skills = employeeSkills(SKILL_CONSTANT, employeeData.employeeType);
+            const skills = employeeSkills(SKILL_CONSTANT, employeeData.employeetype);
 
               const resObj = {
                 givenName: responses[1].rows[0].givenName,
