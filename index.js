@@ -56,14 +56,11 @@ app.post('/signup', (request, response) => {
     username: request.body.username,
     password: hash.passwordHash,
     salt: hash.salt
-};
-
-  console.log(JSON.stringify(user));
+  };
 
   connectionManager.runAction("checkUsername", user)  
               .then(res => {
                 if(res.rows[0]){
-                  console.log(res.rows);
                   response.send("Username already taken!");
                 }else{
                   connectionManager.runAction("userSignup", user)
