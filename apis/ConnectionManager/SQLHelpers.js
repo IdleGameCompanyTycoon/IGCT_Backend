@@ -4,6 +4,26 @@ const { writeLog } = require('./helpers');
 
 
 // Helper Functions
+
+//Save user to database
+const userSignup = (client, user, done, closeConn = false) => {
+  return new Promise((resolve, reject) => {
+    client.query(
+      `INSERT INTO igct."user"(username, password) VALUES ('${user.username}', '${user.password}');`, (error, results) => {
+        if(error) {
+          closeConn && done();
+          writeLog("1", error);
+          reject(error);
+        } else {
+          closeConn && done();
+          writeLog("3", JSON.stringify(results));
+          resolve(results);
+        }
+      }
+      )
+  })
+}
+
 const calcRandomMidOfVals = (valLow, valHigh) => {
   let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
   return valRand + valLow;
@@ -26,11 +46,11 @@ const getRandomEntry = (client, table, done, closeConn = false) => {
       client.query(`SELECT * FROM igct."${table}" ORDER BY RANDOM() limit 1`, (error, results) => {
         if (error) {
           closeConn && done();
-          writeLog("1", error)
+          writeLog("1", error);
           reject(error);
         } else {
           closeConn && done();
-          writeLog("3", JSON.stringify(results))
+          writeLog("3", JSON.stringify(results));
           resolve(results);
         }
     })
@@ -141,5 +161,6 @@ module.exports = {
   getRandomEntry: getRandomEntry,
   getRandomEntryByCondition: getRandomEntryByCondition,
   getContract: getContract,
-  getApplication: getApplication
+  getApplication: getApplication,
+  userSignup: userSignup
 }
