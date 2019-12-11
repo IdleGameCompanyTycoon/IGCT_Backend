@@ -24,13 +24,17 @@ const checkUsername = (client, user, done, closeConn = false) => {
 
 
 const userLogin = (client, user, done, closeConn = false) => {
-  return checkUsername(client, user).then(res => {
-    let enteredHash = authHelpers.saltHashPassword(user.password, res.rows[0].salt)
-    if(enteredHash.passwordHash == res.rows[0].password){
-      return "Successfully authenticated!";
-    } else {
-      return "Wrong credentials!";
-    }
+  return new Promise((resolve, reject) => {
+    checkUsername(client, user).then(res => {
+      let enteredHash = authHelpers.saltHashPassword(user.password, res.rows[0].salt)
+      if(enteredHash.passwordHash == res.rows[0].password){
+        closeConn && done();
+        resolve("Successfully authenticated!");
+      } else {
+        closeConn && done();
+        reject("Wrong credentials!");
+      }
+    })
   })
 }
 
