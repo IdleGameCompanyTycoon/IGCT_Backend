@@ -38,7 +38,23 @@ app.post('/signup', (request, response) => {
       password: authHelpers.saltHashPassword(request.body.password)
   };
 
-  connectionManager.runAction("userSignup", user)
+  connectionManager.runAction("checkUsername", user)  
+  .then(res => {
+    if(res.rows[0]){
+      console.log(res.rows);
+      response.send("Username already taken!");
+    }else{
+      connectionManager.runAction("userSignup", user)
+      .then(response.send("Registered!"))
+      .catch(err => {
+        console.log(err)
+        writeLog("1", err);
+        response.status(500).end()
+      })
+    }
+  })
+  
+  
 });
 
 //Get data

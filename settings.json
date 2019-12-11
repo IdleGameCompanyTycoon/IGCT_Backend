@@ -1,5 +1,5 @@
 {
-    "LOG_LEVEL": "2",
+    "LOG_LEVEL": "3",
     "SKILL_CONSTANT": "1",
     "BASIC_PENALTY": "0.6",
     "TIMED_PENALTY": "1.5",

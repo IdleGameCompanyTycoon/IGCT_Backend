@@ -6,6 +6,27 @@ const { writeLog } = require('./helpers');
 // Helper Functions
 
 //Save user to database
+const checkUsername = (client, user, done, closeConn = false) => {
+  return new Promise((resolve, reject) => {
+    client.query(`SELECT * FROM igct."user" WHERE username='${user.username}'`, (error, results) => {
+      if (error) {
+        closeConn && done();
+        writeLog("1", error);
+        reject(error);
+      } else {
+        closeConn && done();
+        writeLog("3", JSON.stringify(results));
+        resolve(results);
+      }
+  })
+})
+}
+
+
+const userLogin = (client, user, done, closeConn = false) => {
+
+}
+
 const userSignup = (client, user, done, closeConn = false) => {
   return new Promise((resolve, reject) => {
     client.query(
@@ -162,5 +183,6 @@ module.exports = {
   getRandomEntryByCondition: getRandomEntryByCondition,
   getContract: getContract,
   getApplication: getApplication,
-  userSignup: userSignup
+  userSignup: userSignup,
+  checkUsername: checkUsername
 }

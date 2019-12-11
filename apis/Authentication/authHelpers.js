@@ -20,9 +20,6 @@ const saltHashPassword = (userpassword) => {
     let salt = genRandomString(16);
     let passwordData = sha512(userpassword, salt);
     return passwordData.passwordHash;
-    console.log('UserPassword = '+userpassword);
-    console.log('Passwordhash = '+passwordData.passwordHash);
-    console.log('nSalt = '+passwordData.salt);
 }
 
 module.exports = {
