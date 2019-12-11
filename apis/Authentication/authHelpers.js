@@ -16,10 +16,9 @@ const sha512 = (password, salt) => {
     };
 }
 
-const saltHashPassword = (userpassword) => {
-    let salt = genRandomString(16);
+const saltHashPassword = (userpassword, salt = genRandomString(16)) => {
     let passwordData = sha512(userpassword, salt);
-    return passwordData.passwordHash;
+    return passwordData
 }
 
 module.exports = {

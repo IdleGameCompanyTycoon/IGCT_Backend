@@ -24,6 +24,24 @@ const connectionManager = new ConnectionManager();
 
 writeLog("3", "Connection esablished");
 
+app.post('/login', (request, response) => {
+
+  const user = {
+    username: request.body.username,
+    password: request.body.password,
+  };
+
+  connectionManager.runAction("userLogin", user)
+              .then(res => {
+                  console.log(res);
+                  response.send(res);
+              }).catch(err => {
+              console.log(err)
+              writeLog("1", err);
+              response.status(500).end()
+              });
+})
+
 app.post('/signup', (request, response) => {
   if(request.body.password.length < 6){
     response.send("Password too short.");
@@ -33,28 +51,31 @@ app.post('/signup', (request, response) => {
     response.send("Username too short.");
   };
 
+  hash = authHelpers.saltHashPassword(request.body.password);
+
   const user = {
-      username: request.body.username,
-      password: authHelpers.saltHashPassword(request.body.password)
-  };
+    username: request.body.username,
+    password: hash.passwordHash,
+    salt: hash.salt
+};
+
+  console.log(JSON.stringify(user));
 
   connectionManager.runAction("checkUsername", user)  
-  .then(res => {
-    if(res.rows[0]){
-      console.log(res.rows);
-      response.send("Username already taken!");
-    }else{
-      connectionManager.runAction("userSignup", user)
-      .then(response.send("Registered!"))
-      .catch(err => {
-        console.log(err)
-        writeLog("1", err);
-        response.status(500).end()
-      })
-    }
-  })
-  
-  
+              .then(res => {
+                if(res.rows[0]){
+                  console.log(res.rows);
+                  response.send("Username already taken!");
+                }else{
+                  connectionManager.runAction("userSignup", user)
+                  .then(response.send("Registered!"))
+                  .catch(err => {
+                    console.log(err)
+                    writeLog("1", err);
+                    response.status(500).end()
+                  })
+                }
+              })
 });
 
 //Get data

@@ -1,7 +1,7 @@
 const { SKILL_CONSTANT, TIMED_PENALTY, BASIC_PENALTY, APPLICATION_PROPABILITY } = require('../../settings.json');
 const { employeeSkills } = require('./helpers');
 const { writeLog } = require('./helpers');
-
+const authHelpers = require('../Authentication/authHelpers');
 
 // Helper Functions
 
@@ -24,13 +24,20 @@ const checkUsername = (client, user, done, closeConn = false) => {
 
 
 const userLogin = (client, user, done, closeConn = false) => {
-
+  return checkUsername(client, user).then(res => {
+    let enteredHash = authHelpers.saltHashPassword(user.password, res.rows[0].salt)
+    if(enteredHash.passwordHash == res.rows[0].password){
+      return "Successfully authenticated!";
+    } else {
+      return "Wrong credentials!";
+    }
+  })
 }
 
 const userSignup = (client, user, done, closeConn = false) => {
   return new Promise((resolve, reject) => {
     client.query(
-      `INSERT INTO igct."user"(username, password) VALUES ('${user.username}', '${user.password}');`, (error, results) => {
+      `INSERT INTO igct."user"(username, password, salt) VALUES ('${user.username}', '${user.password}', '${user.salt}');`, (error, results) => {
         if(error) {
           closeConn && done();
           writeLog("1", error);
@@ -184,5 +191,6 @@ module.exports = {
   getContract: getContract,
   getApplication: getApplication,
   userSignup: userSignup,
-  checkUsername: checkUsername
+  checkUsername: checkUsername,
+  userLogin: userLogin
 }
