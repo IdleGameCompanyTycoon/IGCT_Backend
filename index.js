@@ -33,12 +33,11 @@ app.post('/login', (request, response) => {
 
   connectionManager.runAction("userLogin", user)
               .then(res => {
-                  console.log(res);
+                  writeLog("3", res);
                   response.send(res);
               }).catch(err => {
-              console.log(err)
-              writeLog("1", err);
-              response.status(500).end()
+              writeLog("3", user.username + "_" + err);
+              response.status(500).send(err)
               });
 })
 

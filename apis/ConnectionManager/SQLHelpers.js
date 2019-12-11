@@ -15,7 +15,6 @@ const checkUsername = (client, user, done, closeConn = false) => {
         reject(error);
       } else {
         closeConn && done();
-        writeLog("3", JSON.stringify(results));
         resolve(results);
       }
   })
