@@ -1,7 +1,7 @@
 const { SKILL_CONSTANT, TIMED_PENALTY, BASIC_PENALTY, APPLICATION_PROPABILITY } = require('../../settings.json');
 const { employeeSkills } = require('./helpers');
 const { writeLog } = require('./helpers');
-const authHelpers = require('../Authentication/authHelpers');
+const hashHelpers = require('../Authentication/hashHelpers');
 
 // Helper Functions
 
@@ -25,7 +25,7 @@ const checkUsername = (client, user, done, closeConn = false) => {
 const userLogin = (client, user, done, closeConn = false) => {
   return new Promise((resolve, reject) => {
     checkUsername(client, user).then(res => {
-      let enteredHash = authHelpers.saltHashPassword(user.password, res.rows[0].salt)
+      let enteredHash = hashHelpers.saltHashPassword(user.password, res.rows[0].salt)
       if(enteredHash.passwordHash == res.rows[0].password){
         closeConn && done();
         resolve("Successfully authenticated!");

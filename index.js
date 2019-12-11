@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const ConnectionManager = require('./apis/ConnectionManager/ConnectionManager');
 const { writeLog } = require('./apis/ConnectionManager/helpers');
 const dir = path.join(__dirname, 'public/img');
-const authHelpers = require('./apis/Authentication/authHelpers');
+const hashHelpers = require('./apis/Authentication/hashHelpers');
 
 
 
@@ -50,7 +50,7 @@ app.post('/signup', (request, response) => {
     response.send("Username too short.");
   };
 
-  hash = authHelpers.saltHashPassword(request.body.password);
+  hash = hashHelpers.saltHashPassword(request.body.password);
 
   const user = {
     username: request.body.username,
