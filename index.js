@@ -46,13 +46,18 @@ app.post('/setranking', (request, response) => {
     username: request.body.username,
     money: request.body.money
   };
-  connectionManager.runAction("setRanking", usermoney)
+  authHelpers.checkToken(request, response, TOKENKEY)
+            .then(decoded => {
+              connectionManager.runAction("setRanking", usermoney)
                 .then(res => {
                   response.send(res);
                 }).catch(err => {
                   response.send(err)
                 });
-
+            }).catch(err => {
+              helpers.writeLog("2", err);
+              response.send(err);
+            });
 })
 
 

@@ -15,11 +15,12 @@ const generateToken = (username, TOKENKEY) => {
 const checkToken = (req, res, TOKENKEY) => {
   return new Promise((resolve, reject) => {
     let token = req.headers['x-access-token'] || req.headers['authorization'];
-    if (token.startsWith('Bearer ')){
-      token = token.slice(7, token.length);
-    }
+
 
     if(token){
+      if (token.startsWith('Bearer ')){
+        token = token.slice(7, token.length);
+      }
       jwt.verify(token, TOKENKEY, (err, decoded) => {
         if(err){
           reject({
