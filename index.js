@@ -39,10 +39,15 @@ const connectionManager = new ConnectionManager();
 
 helpers.writeLog("3", "Connection esablished");
 
-app.post('/test', (request, response) => {
+app.get('/ranking', (request, response) => {
   authHelpers.checkToken(request, response, TOKENKEY)
             .then(decoded => {
-              response.send(decoded);
+              connectionManager.runAction(request.query.operation, "")
+                .then(ranking => {
+                  response.send(ranking.rows);
+                }).catch(err => {
+                  response.send(err);
+                })
             }).catch(err => {
               helpers.writeLog("2", err);
               response.send(err);
