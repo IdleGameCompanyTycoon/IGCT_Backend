@@ -4,9 +4,9 @@ const helpers = require('./helpers');
 
 // SQLHelper Functions
 
-const getAllEntrys = (client, table, orderby, done, closeConn = false) => {
+const getAllEntrys = (client, table, select, orderby, done, closeConn = false) => {
   return new Promise((resolve, reject) => {
-    client.query(`SELECT * FROM igct."${table}" ORDER BY ${orderby} DESC`, (error, results) => {
+    client.query(`SELECT ${select} FROM igct."${table}" ORDER BY ${orderby} DESC`, (error, results) => {
       if (error) {
         closeConn && done();
         helpers.writeLog("1", error);
@@ -123,9 +123,9 @@ const getApplication = (client, query, done) => {
 }
 
 
-const getRanking = (client, query, done) =>{
+const getRanking = (client, query, done) => {
   return new Promise((resolve, reject) => {
-    getAllEntrys(client, 'ranking', '1', done)
+    getAllEntrys(client, 'user', "username, money", '1', done)
       .then(results => {
         resolve(results);
         done();
@@ -136,7 +136,23 @@ const getRanking = (client, query, done) =>{
   });
 }
 
-
+const setRanking = (client, query, done, closeConn = false) => {
+  return new Promise((resolve,reject) => {
+    client.query(
+      `UPDATE igct."user" SET money='${query.money}' WHERE username='${query.username}';`, (error, results) => {
+        if(error) {
+          closeConn && done();
+          helpers.writeLog("1", error);
+          reject(error);
+        } else {
+          closeConn && done();
+          helpers.writeLog("3", JSON.stringify(results));
+          resolve(results);
+        }
+      }
+      )
+  })
+}
 
 
 module.exports = {
@@ -146,5 +162,6 @@ module.exports = {
   getContract: getContract,
   getApplication: getApplication,
   getAllEntrys: getAllEntrys,
-  getRanking: getRanking
+  getRanking: getRanking,
+  setRanking: setRanking
 }
