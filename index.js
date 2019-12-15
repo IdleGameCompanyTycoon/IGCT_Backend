@@ -11,6 +11,7 @@ const dir = path.join(__dirname, 'public/img');
 const hashHelpers = require('./apis/Authentication/hashHelpers');
 const https = require('https');
 const fs = require('fs');
+const helmet = require('helmet');
 
 const options = {
   key: fs.readFileSync('./ssl/cert_export_igct-backend.key'),
@@ -18,6 +19,7 @@ const options = {
   passphrase: PASSPHRASE
 };
 
+app.use(helmet());
 
 app.use('/images', express.static(dir));
 
