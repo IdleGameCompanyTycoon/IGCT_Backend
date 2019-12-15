@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/IdleGameCompanyTycoon/IdleGameCompanyTycoon#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
+    "crypto": "^1.0.1",
     "dotenv": "^6.0.0",
     "ejs": "^2.5.8",
     "express": "^4.16.3",

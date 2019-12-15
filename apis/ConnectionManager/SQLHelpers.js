@@ -1,9 +1,60 @@
 const { SKILL_CONSTANT, TIMED_PENALTY, BASIC_PENALTY, APPLICATION_PROPABILITY } = require('../../settings.json');
 const { employeeSkills } = require('./helpers');
 const { writeLog } = require('./helpers');
-
+const hashHelpers = require('../Authentication/hashHelpers');
 
 // Helper Functions
+
+//Save user to database
+const checkUsername = (client, user, done, closeConn = false) => {
+  return new Promise((resolve, reject) => {
+    client.query(`SELECT * FROM igct."user" WHERE username='${user.username}'`, (error, results) => {
+      if (error) {
+        closeConn && done();
+        writeLog("1", error);
+        reject(error);
+      } else {
+        closeConn && done();
+        resolve(results);
+      }
+  })
+})
+}
+
+
+const userLogin = (client, user, done, closeConn = false) => {
+  return new Promise((resolve, reject) => {
+    checkUsername(client, user).then(res => {
+      let enteredHash = hashHelpers.saltHashPassword(user.password, res.rows[0].salt)
+      if(enteredHash.passwordHash == res.rows[0].password){
+        closeConn && done();
+        resolve("Successfully authenticated!");
+      } else {
+        closeConn && done();
+        reject("Wrong credentials!");
+      }
+    })
+  })
+}
+
+const userSignup = (client, user, done, closeConn = false) => {
+  return new Promise((resolve, reject) => {
+    client.query(
+      `INSERT INTO igct."user"(username, password, salt) VALUES ('${user.username}', '${user.password}', '${user.salt}');`, (error, results) => {
+        if(error) {
+          closeConn && done();
+          writeLog("1", error);
+          reject(error);
+        } else {
+          closeConn && done();
+          writeLog("3", JSON.stringify(results));
+          resolve(results);
+        }
+      }
+      )
+  })
+}
+
 const calcRandomMidOfVals = (valLow, valHigh) => {
   let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
   return valRand + valLow;
@@ -26,11 +77,11 @@ const getRandomEntry = (client, table, done, closeConn = false) => {
       client.query(`SELECT * FROM igct."${table}" ORDER BY RANDOM() limit 1`, (error, results) => {
         if (error) {
           closeConn && done();
-          writeLog("1", error)
+          writeLog("1", error);
           reject(error);
         } else {
           closeConn && done();
-          writeLog("3", JSON.stringify(results))
+          writeLog("3", JSON.stringify(results));
           resolve(results);
         }
     })
@@ -141,5 +192,8 @@ module.exports = {
   getRandomEntry: getRandomEntry,
   getRandomEntryByCondition: getRandomEntryByCondition,
   getContract: getContract,
-  getApplication: getApplication
+  getApplication: getApplication,
+  userSignup: userSignup,
+  checkUsername: checkUsername,
+  userLogin: userLogin
 }

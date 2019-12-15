@@ -2,12 +2,17 @@ const path = require('path')
 const express = require('express');
 const app = express()
 const PORT = process.env.PORT || 5000;
+const bodyParser = require('body-parser');
 const ConnectionManager = require('./apis/ConnectionManager/ConnectionManager');
 const { writeLog } = require('./apis/ConnectionManager/helpers');
-
 const dir = path.join(__dirname, 'public/img');
+const hashHelpers = require('./apis/Authentication/hashHelpers');
+
+
 
 app.use('/images', express.static(dir));
+
+app.use(bodyParser.json());
 
 app.use((request, response, next) => {
   response.header("Access-Control-Allow-Origin", "*");
@@ -16,7 +21,58 @@ app.use((request, response, next) => {
 });
 
 const connectionManager = new ConnectionManager();
+
 writeLog("3", "Connection esablished");
+
+app.post('/login', (request, response) => {
+
+  const user = {
+    username: request.body.username,
+    password: request.body.password,
+  };
+
+  connectionManager.runAction("userLogin", user)
+              .then(res => {
+                  writeLog("3", res);
+                  response.send(res);
+              }).catch(err => {
+              writeLog("3", user.username + "_" + err);
+              response.status(500).send(err)
+              });
+})
+
+app.post('/signup', (request, response) => {
+  if(request.body.password.length < 6){
+    response.send("Password too short.");
+  };
+
+  if(request.body.username.length < 3){
+    response.send("Username too short.");
+  };
+
+  hash = hashHelpers.saltHashPassword(request.body.password);
+
+  const user = {
+    username: request.body.username,
+    password: hash.passwordHash,
+    salt: hash.salt
+  };
+
+  connectionManager.runAction("checkUsername", user)  
+              .then(res => {
+                if(res.rows[0]){
+                  response.send("Username already taken!");
+                }else{
+                  connectionManager.runAction("userSignup", user)
+                  .then(response.send("Registered!"))
+                  .catch(err => {
+                    console.log(err)
+                    writeLog("1", err);
+                    response.status(500).end()
+                  })
+                }
+              })
+});
 
 //Get data
 app.get('/getData', (request, response, next) => {
