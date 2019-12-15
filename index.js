@@ -43,7 +43,7 @@ app.post('/login', (request, response) => {
   connectionManager.runAction("userLogin", user)
               .then(res => {
                   writeLog("3", res);
-                  response.send(res);
+                  response.status(200).send(res);
               }).catch(err => {
               writeLog("3", user.username + "_" + err);
               response.status(500).send(err)
@@ -73,7 +73,7 @@ app.post('/signup', (request, response) => {
                   response.send("Username already taken!");
                 }else{
                   connectionManager.runAction("userSignup", user)
-                  .then(response.send("Registered!"))
+                  .then(response.status(201).send("Registered!"))
                   .catch(err => {
                     console.log(err)
                     writeLog("1", err);
