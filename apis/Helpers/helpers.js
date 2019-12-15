@@ -1,6 +1,6 @@
-const templates = require('./employeeTemplates')
+const templates = require('../ConnectionManager/employeeTemplates')
 const fs = require('fs');
-const { LOG_LEVEL } = require('../../settings.json');
+const { TIMED_PENALTY, BASIC_PENALTY, APPLICATION_PROPABILITY, LOG_LEVEL } = require('../../settings.json');
 
 
 const writeLog = (severity = "3", message) => {
@@ -67,7 +67,40 @@ const employeeSkills = (cap, employeeType) => {
   return skills;
 }
 
+const getRandomEmployeeType = () => {
+  const probArr = [];
+  Object.keys(APPLICATION_PROPABILITY).forEach((key) => {
+    let num = APPLICATION_PROPABILITY[key];
+    while(num >= 1) {
+        probArr.push(key);
+        num--;
+    }
+  })
+  type = probArr[Math.floor(Math.random()*probArr.length)];
+  return type;
+}
+
+const calcPenalty = (valLow, valHigh, contractType) => {
+  let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
+
+  if(contractType === "basic"){
+    valRand = valRand * BASIC_PENALTY;
+  }else if(contractType === "timed"){
+    valRand = valRand * TIMED_PENALTY;
+  }
+  
+  return valRand + valLow;
+}
+
+const calcRandomMidOfVals = (valLow, valHigh) => {
+  let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
+  return valRand + valLow;
+}
+
 module.exports = {
   employeeSkills: employeeSkills,
-  writeLog: writeLog
+  writeLog: writeLog,
+  getRandomEmployeeType: getRandomEmployeeType,
+  calcPenalty: calcPenalty,
+  calcRandomMidOfVals: calcRandomMidOfVals,
 }

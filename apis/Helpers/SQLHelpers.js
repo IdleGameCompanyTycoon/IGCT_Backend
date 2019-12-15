@@ -1,87 +1,19 @@
-const { SKILL_CONSTANT, TIMED_PENALTY, BASIC_PENALTY, APPLICATION_PROPABILITY } = require('../../settings.json');
-const { employeeSkills } = require('./helpers');
-const { writeLog } = require('./helpers');
-const hashHelpers = require('../Authentication/hashHelpers');
-
-// Helper Functions
-
-//Save user to database
-const checkUsername = (client, user, done, closeConn = false) => {
-  return new Promise((resolve, reject) => {
-    client.query(`SELECT * FROM igct."user" WHERE username='${user.username}'`, (error, results) => {
-      if (error) {
-        closeConn && done();
-        writeLog("1", error);
-        reject(error);
-      } else {
-        closeConn && done();
-        resolve(results);
-      }
-  })
-})
-}
+const { SKILL_CONSTANT } = require('../../settings.json');
+const helpers = require('./helpers');
 
 
-const userLogin = (client, user, done, closeConn = false) => {
-  return new Promise((resolve, reject) => {
-    checkUsername(client, user).then(res => {
-      let enteredHash = hashHelpers.saltHashPassword(user.password, res.rows[0].salt)
-      if(enteredHash.passwordHash == res.rows[0].password){
-        closeConn && done();
-        resolve("Successfully authenticated!");
-      } else {
-        closeConn && done();
-        reject("Wrong credentials!");
-      }
-    })
-  })
-}
-
-const userSignup = (client, user, done, closeConn = false) => {
-  return new Promise((resolve, reject) => {
-    client.query(
-      `INSERT INTO igct."user"(username, password, salt) VALUES ('${user.username}', '${user.password}', '${user.salt}');`, (error, results) => {
-        if(error) {
-          closeConn && done();
-          writeLog("1", error);
-          reject(error);
-        } else {
-          closeConn && done();
-          writeLog("3", JSON.stringify(results));
-          resolve(results);
-        }
-      }
-      )
-  })
-}
-
-const calcRandomMidOfVals = (valLow, valHigh) => {
-  let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
-  return valRand + valLow;
-}
-
-const calcPenalty = (valLow, valHigh, contractType) => {
-  let valRand = Math.floor(Math.random() * (valHigh - valLow + 1));
-
-  if(contractType === "basic"){
-    valRand = valRand * BASIC_PENALTY;
-  }else if(contractType === "timed"){
-    valRand = valRand * TIMED_PENALTY;
-  }
-  
-  return valRand + valLow;
-}
+// SQLHelper Functions
 
 const getRandomEntry = (client, table, done, closeConn = false) => {
   return new Promise((resolve, reject) => {
       client.query(`SELECT * FROM igct."${table}" ORDER BY RANDOM() limit 1`, (error, results) => {
         if (error) {
           closeConn && done();
-          writeLog("1", error);
+          helpers.writeLog("1", error);
           reject(error);
         } else {
           closeConn && done();
-          writeLog("3", JSON.stringify(results));
+          helpers.writeLog("3", JSON.stringify(results));
           resolve(results);
         }
     })
@@ -94,11 +26,11 @@ const getRandomEntryByCondition = (client, table, condition, done, closeConn = f
         if (error) {
           closeConn && done();
           reject(error);
-          writeLog("1", error)
+          helpers.writeLog("1", error)
         } else {
           // Close connection if this is the last action
           closeConn && done();
-          writeLog("3", JSON.stringify(results))
+          helpers.writeLog("3", JSON.stringify(results))
           resolve(results);
         }
     })
@@ -114,9 +46,9 @@ const getContract = (client, query, done) => {
           const resObj =  {
             name: contract.name,
             description: contract.desc,
-            loc: calcRandomMidOfVals(contract.loc_lower, contract.loc_higher),
-            revenue: calcRandomMidOfVals(contract.revenue_lower, contract.revenue_higher),
-            penalty: calcPenalty(contract.revenue_lower, contract.revenue_higher, contract.contractType),
+            loc: helpers.calcRandomMidOfVals(contract.loc_lower, contract.loc_higher),
+            revenue: helpers.calcRandomMidOfVals(contract.revenue_lower, contract.revenue_higher),
+            penalty: helpers.calcPenalty(contract.revenue_lower, contract.revenue_higher, contract.contractType),
             contractType: contract.contractType,
             companyType: contract.companyType,
             team: undefined,
@@ -134,22 +66,22 @@ const getApplication = (client, query, done) => {
   return new Promise((resolve, reject ) => {
     const lastName = getRandomEntry(client, 'Employee_lastName', done);
     const givenName = getRandomEntry(client, 'Employee_givenName', done);
-    let type = getRandomEmployeeType();
+    let type = helpers.getRandomEmployeeType();
     const data = getRandomEntryByCondition(client, 'Employee_data', `employeetype='${type}'`, done);
     // Add dynamic employee skill posibillitys
     // Proceed with data processing when all promises have been resolved
     Promise.all([lastName, givenName, data])
             .then(responses => {
             const employeeData = responses[2].rows[0];
-            const skills = employeeSkills(SKILL_CONSTANT, employeeData.employeetype);
+            const skills = helpers.employeeSkills(SKILL_CONSTANT, employeeData.employeetype);
 
               const resObj = {
                 givenName: responses[1].rows[0].givenName,
                 lastName: responses[0].rows[0].lastName,
                 employeeHistory: employeeData.history,
                 
-                loc: calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
-                payment: calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher),
+                loc: helpers.calcRandomMidOfVals(employeeData.loc_lower, employeeData.loc_higher),
+                payment: helpers.calcRandomMidOfVals(employeeData.payment_lower, employeeData.payment_higher),
                 skills: skills,
                 workingDays: undefined,
                 working: false,
@@ -174,26 +106,12 @@ const getApplication = (client, query, done) => {
   })
 }
 
-const getRandomEmployeeType = () => {
-  const probArr = [];
-  Object.keys(APPLICATION_PROPABILITY).forEach((key) => {
-    let num = APPLICATION_PROPABILITY[key];
-    while(num >= 1) {
-        probArr.push(key);
-        num--;
-    }
-  })
-  type = probArr[Math.floor(Math.random()*probArr.length)];
-  return type;
-}
+
 
 module.exports = {
-  calcRandomMidOfVals: calcRandomMidOfVals,
+  //calcRandomMidOfVals: calcRandomMidOfVals,
   getRandomEntry: getRandomEntry,
   getRandomEntryByCondition: getRandomEntryByCondition,
   getContract: getContract,
-  getApplication: getApplication,
-  userSignup: userSignup,
-  checkUsername: checkUsername,
-  userLogin: userLogin
+  getApplication: getApplication
 }

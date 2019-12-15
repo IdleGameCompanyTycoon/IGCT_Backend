@@ -1,7 +1,7 @@
 const { Client, Pool } = require('pg');
-const helper = require('./SQLHelpers');
-const { writeLog } = require('./helpers');
+const { writeLog } = require('../Helpers/helpers');
 require('dotenv').config();
+const CMHelpers = require('./CMHelpers');
 
 class ConnectionManager {
   connect() {
@@ -38,8 +38,8 @@ class ConnectionManager {
   }
 
   success(action, client, query, done) {
-    if(helper[action]) {
-      return helper[action](client, query, done)
+    if(CMHelpers[action]) {
+      return CMHelpers[action](client, query, done)
     } else{
       done();
       return Promise.reject("Operation not found: " + action)
