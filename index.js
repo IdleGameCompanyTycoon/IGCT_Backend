@@ -1,13 +1,22 @@
 const path = require('path')
 const express = require('express');
-const app = express()
+const app = express();
+require('dotenv').config();
+const PASSPHRASE = process.env.PASSPHRASE;
 const PORT = process.env.PORT || 5000;
 const bodyParser = require('body-parser');
 const ConnectionManager = require('./apis/ConnectionManager/ConnectionManager');
 const { writeLog } = require('./apis/ConnectionManager/helpers');
 const dir = path.join(__dirname, 'public/img');
 const hashHelpers = require('./apis/Authentication/hashHelpers');
+const https = require('https');
+const fs = require('fs');
 
+const options = {
+  key: fs.readFileSync('./ssl/cert_export_igct-backend.key'),
+  cert: fs.readFileSync('./ssl/cert_export_igct-backend.crt'),
+  passphrase: PASSPHRASE
+};
 
 
 app.use('/images', express.static(dir));
@@ -92,5 +101,5 @@ app.get('/getData', (request, response, next) => {
                 });
 })
 
-
-app.listen(PORT);
+https.createServer(options, app).listen(PORT);
+//app.listen(PORT);
