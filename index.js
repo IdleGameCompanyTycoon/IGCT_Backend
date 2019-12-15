@@ -1,20 +1,25 @@
 const path = require('path')
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
+const https = require('https');
+const fs = require('fs');
+const helmet = require('helmet');
+
+//Enviromental Variables
 require('dotenv').config();
 const TOKENKEY = process.env.TOKENKEY;
 const PASSPHRASE = process.env.PASSPHRASE;
 const PORT = process.env.PORT || 5000;
-const bodyParser = require('body-parser');
+
+//Internal Dependencies
 const ConnectionManager = require('./apis/ConnectionManager/ConnectionManager');
 const helpers = require('./apis/Helpers/helpers');
 const hashHelpers = require('./apis/Authentication/hashHelpers');
 const authHelpers = require('./apis/Authentication/authHelpers');
 const dir = path.join(__dirname, 'public/img');
-const https = require('https');
-const fs = require('fs');
-const helmet = require('helmet');
 
+//Options for HTTPS
 const options = {
   key: fs.readFileSync('./ssl/cert_export_igct-backend.key'),
   cert: fs.readFileSync('./ssl/cert_export_igct-backend.crt'),
@@ -24,11 +29,8 @@ const options = {
 
 
 app.use(helmet());
-
 app.use('/images', express.static(dir));
-
 app.use(bodyParser.json());
-
 app.use((request, response, next) => {
   response.header("Access-Control-Allow-Origin", "*");
   response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -69,6 +71,7 @@ app.get('/ranking', (request, response) => {
             });
 });
 
+
 app.post('/login', (request, response) => {
 
   const user = {
@@ -91,6 +94,7 @@ app.post('/login', (request, response) => {
               response.status(500).send(err)
               });
 })
+
 
 app.post('/signup', (request, response) => {
   if(request.body.password.length < 6){
@@ -125,7 +129,7 @@ app.post('/signup', (request, response) => {
               })
 });
 
-//Get data
+
 app.get('/getData', (request, response, next) => {
   let ip = (request.headers['x-forwarded-for'] || '').split(',').pop() || 
     request.connection.remoteAddress || 
@@ -142,6 +146,7 @@ app.get('/getData', (request, response, next) => {
                 response.status(500).end()
                 });
 })
+
 
 https.createServer(options, app).listen(PORT);
 //app.listen(PORT);
