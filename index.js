@@ -128,5 +128,5 @@ app.get('/getData', (request, response, next) => {
                 });
 })
 
-//https.createServer(options, app).listen(PORT);
-app.listen(PORT);
+https.createServer(options, app).listen(PORT);
+//app.listen(PORT);
