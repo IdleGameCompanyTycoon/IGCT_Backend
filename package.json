@@ -26,6 +26,7 @@
     "fs": "0.0.1-security",
     "helmet": "^3.21.2",
     "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
     "pg": "^7.4.1",
     "psql": "0.0.1"
   }
