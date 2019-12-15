@@ -1,5 +1,46 @@
 const hashHelpers = require('./hashHelpers');
 const helpers = require('../Helpers/helpers');
+const jwt = require('jsonwebtoken');
+
+const generateToken = (username, TOKENKEY) => {
+  return new Promise((resolve, reject) => {
+    let token = jwt.sign({username: username},
+      TOKENKEY,
+      {expiresIn: '24h'}
+      );
+    resolve(token);
+  });
+}
+
+const checkToken = (req, res, TOKENKEY) => {
+  return new Promise((resolve, reject) => {
+    let token = req.headers['x-access-token'] || req.headers['authorization'];
+    if (token.startsWith('Bearer ')){
+      token = token.slice(7, token.length);
+    }
+
+    if(token){
+      jwt.verify(token, TOKENKEY, (err, decoded) => {
+        if(err){
+          reject({
+            success: false,
+            message: 'Token is not valid'
+          });
+        } else {
+          req.decoded = decoded;
+          resolve(req.decoded);
+        }
+      });
+    } else {
+      reject({
+        success: false,
+        message: 'Auth token is not supplied'
+      });
+    }
+  });
+};
+
+
 //Save user to database
 const checkUsername = (client, user, done, closeConn = false) => {
     return new Promise((resolve, reject) => {
@@ -53,5 +94,7 @@ const checkUsername = (client, user, done, closeConn = false) => {
   module.exports = {
     userSignup: userSignup,
     checkUsername: checkUsername,
-    userLogin: userLogin
+    userLogin: userLogin,
+    generateToken: generateToken,
+    checkToken: checkToken
   }

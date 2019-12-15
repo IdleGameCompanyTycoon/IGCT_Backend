@@ -2,13 +2,15 @@ const path = require('path')
 const express = require('express');
 const app = express();
 require('dotenv').config();
+const TOKENKEY = process.env.TOKENKEY;
 const PASSPHRASE = process.env.PASSPHRASE;
 const PORT = process.env.PORT || 5000;
 const bodyParser = require('body-parser');
 const ConnectionManager = require('./apis/ConnectionManager/ConnectionManager');
-const { writeLog } = require('./apis/Helpers/helpers');
-const dir = path.join(__dirname, 'public/img');
+const helpers = require('./apis/Helpers/helpers');
 const hashHelpers = require('./apis/Authentication/hashHelpers');
+const authHelpers = require('./apis/Authentication/authHelpers');
+const dir = path.join(__dirname, 'public/img');
 const https = require('https');
 const fs = require('fs');
 const helmet = require('helmet');
@@ -18,6 +20,8 @@ const options = {
   cert: fs.readFileSync('./ssl/cert_export_igct-backend.crt'),
   passphrase: PASSPHRASE
 };
+
+
 
 app.use(helmet());
 
@@ -33,7 +37,17 @@ app.use((request, response, next) => {
 
 const connectionManager = new ConnectionManager();
 
-writeLog("3", "Connection esablished");
+helpers.writeLog("3", "Connection esablished");
+
+app.post('/test', (request, response) => {
+  authHelpers.checkToken(request, response, TOKENKEY)
+            .then(decoded => {
+              response.send(decoded);
+            }).catch(err => {
+              helpers.writeLog("2", err);
+              response.send(err);
+            });
+});
 
 app.post('/login', (request, response) => {
 
@@ -44,10 +58,16 @@ app.post('/login', (request, response) => {
 
   connectionManager.runAction("userLogin", user)
               .then(res => {
-                  writeLog("3", res);
-                  response.status(200).send(res);
+                  helpers.writeLog("3", res);
+                  authHelpers.generateToken(user.username, TOKENKEY)
+                          .then(token => {
+                            response.status(200).send(token);
+                          }).catch(err => {
+                            helpers.writeLog("2", err);
+                            response.send(err);
+                          });
               }).catch(err => {
-              writeLog("3", user.username + "_" + err);
+                helpers.writeLog("3", user.username + "_" + err);
               response.status(500).send(err)
               });
 })
@@ -78,7 +98,7 @@ app.post('/signup', (request, response) => {
                   .then(response.status(201).send("Registered!"))
                   .catch(err => {
                     console.log(err)
-                    writeLog("1", err);
+                    helpers.writeLog("1", err);
                     response.status(500).end()
                   })
                 }
@@ -92,13 +112,13 @@ app.get('/getData', (request, response, next) => {
     request.socket.remoteAddress || 
     request.connection.socket.remoteAddress
 
-  writeLog("0", ip)
+    helpers.writeLog("0", ip)
 
   connectionManager.runAction(request.query.operation, request.query)
               .then(res => response.send(res))
               .catch(err => {
                 console.log(err)
-                writeLog("1", err);
+                helpers.writeLog("1", err);
                 response.status(500).end()
                 });
 })
