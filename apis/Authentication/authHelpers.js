@@ -87,7 +87,7 @@ const checkUsername = (client, user, done, closeConn = false) => {
             resolve(results);
           }
         }
-        )
+      )
     })
   }
 
