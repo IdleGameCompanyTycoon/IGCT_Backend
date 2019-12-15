@@ -56,7 +56,7 @@ app.post('/setranking', (request, response) => {
                 });
             }).catch(err => {
               helpers.writeLog("2", err);
-              response.send(err);
+              response.status(401).send(err);
             });
 })
 
