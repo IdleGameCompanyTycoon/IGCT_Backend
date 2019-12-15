@@ -4,6 +4,22 @@ const helpers = require('./helpers');
 
 // SQLHelper Functions
 
+const getAllEntrys = (client, table, orderby, done, closeConn = false) => {
+  return new Promise((resolve, reject) => {
+    client.query(`SELECT * FROM igct."${table}" ORDER BY ${orderby} DESC`, (error, results) => {
+      if (error) {
+        closeConn && done();
+        helpers.writeLog("1", error);
+        reject(error);
+      } else {
+        closeConn && done();
+        helpers.writeLog("3", JSON.stringify(results));
+        resolve(results);
+      }
+    })
+  })
+}
+
 const getRandomEntry = (client, table, done, closeConn = false) => {
   return new Promise((resolve, reject) => {
       client.query(`SELECT * FROM igct."${table}" ORDER BY RANDOM() limit 1`, (error, results) => {
@@ -107,11 +123,28 @@ const getApplication = (client, query, done) => {
 }
 
 
+const getRanking = (client, query, done) =>{
+  return new Promise((resolve, reject) => {
+    getAllEntrys(client, 'ranking', '1', done)
+      .then(results => {
+        resolve(results);
+        done();
+      }).catch(err => {
+        done();
+        reject(err);
+      })
+  });
+}
+
+
+
 
 module.exports = {
   //calcRandomMidOfVals: calcRandomMidOfVals,
   getRandomEntry: getRandomEntry,
   getRandomEntryByCondition: getRandomEntryByCondition,
   getContract: getContract,
-  getApplication: getApplication
+  getApplication: getApplication,
+  getAllEntrys: getAllEntrys,
+  getRanking: getRanking
 }
