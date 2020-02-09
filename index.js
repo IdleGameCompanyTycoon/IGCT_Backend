@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const https = require('https');
 const fs = require('fs');
 const helmet = require('helmet');
-
+const router = express.Router();
 //Enviromental Variables
 require('dotenv').config();
 const TOKENKEY = process.env.TOKENKEY;
@@ -134,7 +134,7 @@ app.post('/signup', (request, response) => {
               })
 });
 
-
+/*
 app.get('/getData', (request, response, next) => {
   let ip = (request.headers['x-forwarded-for'] || '').split(',').pop() || 
     request.connection.remoteAddress || 
@@ -150,6 +150,30 @@ app.get('/getData', (request, response, next) => {
                 helpers.writeLog("1", err);
                 response.status(500).end()
                 });
+})
+*/
+
+app.get('/getData/:first/:second', (request, response, next) => {
+  console.log('TEST')
+  let ip = (request.headers['x-forwarded-for'] || '').split(',').pop() || 
+    request.connection.remoteAddress || 
+    request.socket.remoteAddress || 
+    request.connection.socket.remoteAddress
+
+  helpers.writeLog("0", ip)
+
+  const first = request.params.first;
+  const second = request.params.second;
+
+  console.log(first);
+
+  connectionManager.runAction("get" + first, second)
+  .then(res => response.send(res))
+  .catch(err => {
+    console.log(err)
+    helpers.writeLog("1", err);
+    response.status(500).end()
+  });
 })
 
 
